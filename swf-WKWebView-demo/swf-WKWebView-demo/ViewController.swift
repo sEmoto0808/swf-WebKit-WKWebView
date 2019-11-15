@@ -53,6 +53,12 @@ extension ViewController: WKNavigationDelegate {
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         print("読み込み設定（リクエスト前）")
         
+        /*
+         * WebView内の特定のリンクをタップした時の処理などが書ける
+         */
+        let url = navigationAction.request.url
+        print("読み込もうとしているページのURLが取得できる: ", url ?? "")
+        
         /*  これを設定しないとアプリがクラッシュする
          *  .allow  : 読み込み許可
          *  .cancel : 読み込みキャンセル
