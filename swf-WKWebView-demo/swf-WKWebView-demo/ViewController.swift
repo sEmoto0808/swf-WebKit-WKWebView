@@ -11,7 +11,7 @@ import WebKit  // WebKitをインポート
 
 class ViewController: UIViewController {
 
-    private var wkWebView:WKWebView!  // 現時点(2018/07/29)storyboardから作成できないのでコードで生成
+    private var wkWebView: WKWebView!  // 現時点(2018/07/29)storyboardから作成できないのでコードで生成
     private let demoURL = "https://www.apple.com/jp/"
     
     override func viewDidLoad() {
@@ -120,4 +120,77 @@ extension ViewController: WKNavigationDelegate {
 }
 
 // MARK: - WKUIDelegate（jsとの連携系）
-extension ViewController: WKUIDelegate {}
+extension ViewController: WKUIDelegate {
+    
+    // alertを表示する
+    func webView(_ webView: WKWebView,
+                 runJavaScriptAlertPanelWithMessage message: String,
+                 initiatedByFrame frame: WKFrameInfo,
+                 completionHandler: @escaping () -> Void) {
+        let alertController = UIAlertController(title: "title",
+                                                message: "message",
+                                                preferredStyle: .alert)
+        
+        let okAction = UIAlertAction(title: "OK", style: .default) { action in
+            completionHandler()
+        }
+        
+        alertController.addAction(okAction)
+        
+        present(alertController ,animated: true ,completion: nil)
+    }
+    
+    // confirm dialogを表示する
+    func webView(_ webView: WKWebView,
+                 runJavaScriptConfirmPanelWithMessage message: String,
+                 initiatedByFrame frame: WKFrameInfo,
+                 completionHandler: @escaping (Bool) -> Void) {
+        let alertController = UIAlertController(title: "title",
+                                                message: "message",
+                                                preferredStyle: .alert)
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { action in
+            completionHandler(false)
+        }
+        let okAction = UIAlertAction(title: "OK", style: .default) { action in
+            completionHandler(true)
+        }
+        
+        alertController.addAction(cancelAction)
+        alertController.addAction(okAction)
+        
+        present(alertController ,animated: true ,completion: nil)
+    }
+    
+    // 入力フォーム(prompt)を表示する
+    func webView(_ webView: WKWebView,
+                 runJavaScriptTextInputPanelWithPrompt prompt: String,
+                 defaultText: String?,
+                 initiatedByFrame frame: WKFrameInfo,
+                 completionHandler: @escaping (String?) -> Void) {
+        let alertController = UIAlertController(title: "title",
+                                                message: prompt,
+                                                preferredStyle: .alert)
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { action in
+            completionHandler("")
+        }
+        
+        let okHandler = { () -> Void in
+            if let textField = alertController.textFields?.first {
+                completionHandler(textField.text)
+            } else {
+                completionHandler("")
+            }
+        }
+        let okAction = UIAlertAction(title: "OK", style: .default) { action in
+            okHandler()
+        }
+        
+        alertController.addTextField() { $0.text = defaultText }
+        alertController.addAction(cancelAction)
+        alertController.addAction(okAction)
+        
+        present(alertController ,animated: true ,completion: nil)
+    }
+}
